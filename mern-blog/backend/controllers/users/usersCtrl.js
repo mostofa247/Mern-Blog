@@ -1,7 +1,10 @@
 const expressAsyncHandler = require("express-async-handler");
+const sgMail = require("@sendgrid/mail");
 const generateToken = require("../../config/token/generateToken");
 const User = require("../../model/user/User");
 const validateMongodbId = require("../../utils/validdateMongodbID");
+
+sgMail.setApiKey(process.env.SEND_GRID_API_KEY);
 
 const userRegisterCtrl = expressAsyncHandler(async (req, res) => {
   const userExists = await User.findOne({ email: req?.body?.email });
@@ -205,6 +208,21 @@ const unBlockUserCtrl = expressAsyncHandler(async (req, res) => {
   res.json(user);
 });
 
+const generateVerificationTokenCtrl = expressAsyncHandler(async (req, res) => {
+  try {
+    const msg = {
+      to: "e.tweneboah1@gmail.com",
+      from: "twentekghana@gmail.com",
+      subject: "My first Node js email sending",
+      text: "Hey check me out for this email",
+    };
+    await sgMail.send(msg);
+    res.json("Send Mail");
+  } catch (error) {
+    res.json(error);
+  }
+});
+
 module.exports = {
   userRegisterCtrl,
   loginUserCtrl,
@@ -218,4 +236,5 @@ module.exports = {
   unfollowUserCtrl,
   blockUserCtrl,
   unBlockUserCtrl,
+  generateVerificationTokenCtrl,
 };
